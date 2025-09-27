@@ -15,9 +15,9 @@ A lightweight Python CLI tool to monitor large spot trades on Binance for any US
 - `websockets` library (`pip install websockets`)
 
 ## Usage
-1. Save the script as `aggr.py`.
+1. Save the script as `tape.py`.
 2. Install dependency: `pip install websockets`
-3. Run: `python aggr.py`
+3. Run: `python tape.py`
 4. Monitor trades for BTC/USDT. Enter a new symbol (e.g., `eth`, `doge`) to switch pairs.
 5. Ctrl+C to exit.
 
