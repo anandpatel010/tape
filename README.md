@@ -17,7 +17,7 @@ A lightweight Python CLI tool to monitor large spot trades on Binance for any US
 ## Usage
 1. Save the script as `aggr.py`.
 2. Install dependency: `pip install websockets`
-3. Run: `python trade_tape.py`
+3. Run: `python aggr.py`
 4. Monitor trades for BTC/USDT. Enter a new symbol (e.g., `eth`, `doge`) to switch pairs.
 5. Ctrl+C to exit.
 
