@@ -40,7 +40,7 @@ async def main():
 
         ws_url = f"wss://stream.binance.com:9443/ws/{current_symbol}@trade"
         upper_symbol = current_symbol.upper().replace('USDT', '/USDT')
-
+        print(f"{CYAN}Connected to WebSocket {RESET}")
         print(f"\nWatching large trades (>${value_threshold}) for {upper_symbol} on Binance... (Enter new symbol like 'doge' to switch)")
         print("Timestamp | Side | $Value (Base Amount) @ Avg Price (USDT)")
 
