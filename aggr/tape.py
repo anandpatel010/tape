@@ -9,6 +9,7 @@ import queue as thread_queue
 GREEN = "\033[32m"
 PURPLE = "\033[35m"
 RESET = "\033[0m"
+CYAN   = "\033[36m"
 
 async def main():
     symbol_queue = asyncio.Queue()  # Async queue for symbol changes
