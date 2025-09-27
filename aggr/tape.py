@@ -89,7 +89,10 @@ async def main():
                         last_amount = amount
                         last_time_prefix = time_prefix
 
+                        side = 'SELL' if is_buyer_maker else 'BUY'
+
                         if formatted_time != current_time:
+                            # Print previous bucket if it exists and meets threshold
                             if current_time is not None:
                                 for side, data in totals.items():
                                     if data['total_value'] > value_threshold:
@@ -101,15 +104,17 @@ async def main():
                                         bars = (color + bar_char + RESET) * num_bars
                                         print(f"{current_time} | {color}{side}{RESET} | ${value:,.0f} ({amount:.4f} Base) @ {avg_price:.2f}" + (f" {bars}" if num_bars > 0 else ""))
 
+                            # Reset totals for new timestamp
+                            totals = {
+                                'BUY': {'total_amount': 0.0, 'total_value': 0.0},
+                                'SELL': {'total_amount': 0.0, 'total_value': 0.0}
+                            }
                             current_time = formatted_time
-                            totals['BUY']['total_amount'] = 0.0
-                            totals['BUY']['total_value'] = 0.0
-                            totals['SELL']['total_amount'] = 0.0
-                            totals['SELL']['total_value'] = 0.0
 
-                        side = 'SELL' if is_buyer_maker else 'BUY'
+                        # Accumulate trade into current timestamp bucket
                         totals[side]['total_amount'] += amount
                         totals[side]['total_value'] += amount * price
+
         except Exception as e:
             print(f"{RED}Connection Error for {upper_symbol}: {e}. Reconnecting in 1s...{RESET}")
             await asyncio.sleep(1)
