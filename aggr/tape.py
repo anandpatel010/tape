@@ -13,7 +13,7 @@ RESET = "\033[0m"
 
 async def main():
     current_symbol = 'btcusdt'  # Start with BTC/USDT
-    value_threshold = 100.0  # Show only aggregated trades where total $ value > this
+    value_threshold = 100.0  # Show only trades where $ value > this
     million_threshold = 1000000.0  # Use gold for trades >= $1M
     bar_threshold = 10000  # USD per bar segment
     bar_char = "▬"
@@ -49,13 +49,7 @@ async def main():
 
         ws_url = f"wss://stream.binance.com:9443/ws/{current_symbol}@trade"
         print(f"\nWatching large trades (>${value_threshold}) for {upper_symbol} on Binance... (Enter new symbol like 'doge' to switch)")
-        print("Timestamp | Side | $Value (Base Amount) @ Avg Price (USDT)")
-
-        current_time = None
-        totals = {
-            'BUY': {'total_amount': 0.0, 'total_value': 0.0},
-            'SELL': {'total_amount': 0.0, 'total_value': 0.0}
-        }
+        print("Timestamp | Side | $Value (Base Amount) @ Price (USDT)")
 
         try:
             async with websockets.connect(ws_url) as ws:
@@ -90,30 +84,13 @@ async def main():
                         last_time_prefix = time_prefix
 
                         side = 'SELL' if is_buyer_maker else 'BUY'
+                        value = amount * price
 
-                        if formatted_time != current_time:
-                            # Print previous bucket if it exists and meets threshold
-                            if current_time is not None:
-                                for side, data in totals.items():
-                                    if data['total_value'] > value_threshold:
-                                        avg_price = data['total_value'] / data['total_amount'] if data['total_amount'] > 0 else 0
-                                        value = data['total_value']
-                                        amount = data['total_amount']
-                                        color = GOLD if value >= million_threshold else (CYAN if side == 'BUY' else RED)
-                                        num_bars = int(value // bar_threshold)
-                                        bars = (color + bar_char + RESET) * num_bars
-                                        print(f"{current_time} | {color}{side}{RESET} | ${value:,.0f} ({amount:.4f} Base) @ {avg_price:.2f}" + (f" {bars}" if num_bars > 0 else ""))
-
-                            # Reset totals for new timestamp
-                            totals = {
-                                'BUY': {'total_amount': 0.0, 'total_value': 0.0},
-                                'SELL': {'total_amount': 0.0, 'total_value': 0.0}
-                            }
-                            current_time = formatted_time
-
-                        # Accumulate trade into current timestamp bucket
-                        totals[side]['total_amount'] += amount
-                        totals[side]['total_value'] += amount * price
+                        if value > value_threshold:
+                            color = GOLD if value >= million_threshold else (CYAN if side == 'BUY' else RED)
+                            num_bars = int(value // bar_threshold)
+                            bars = (color + bar_char + RESET) * num_bars
+                            print(f"{formatted_time} | {color}{side}{RESET} | ${value:,.0f} ({amount:.4f} Base) @ {price:.2f}" + (f" {bars}" if num_bars > 0 else ""))
 
         except Exception as e:
             print(f"{RED}Connection Error for {upper_symbol}: {e}. Reconnecting in 1s...{RESET}")
